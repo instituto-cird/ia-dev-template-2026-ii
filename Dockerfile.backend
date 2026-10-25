@@ -1,0 +1,27 @@
+FROM python:3.14-slim
+
+# Certificados del sistema al día (incidente eMudhra/emSign, oct-2026).
+# Reconstruir SIN cache cuando haya incidentes de CA: docker compose build --no-cache
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends --only-upgrade ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# uv con versión FIJA (nunca :latest). 0.13.4 = primera versión sin la CA comprometida.
+COPY --from=ghcr.io/astral-sh/uv:0.13.4 /uv /usr/local/bin/uv
+
+WORKDIR /app
+
+# Copia archivos de dependencias primero (aprovecha el cache de Docker)
+COPY pyproject.toml uv.lock ./
+
+# Instala dependencias de producción (sin dev tools), exactamente las del lockfile
+RUN uv sync --frozen --no-dev
+
+# Copia el código fuente
+COPY app/ ./app/
+
+# Expone el puerto de la API
+EXPOSE 8000
+
+# Arranca FastAPI con uvicorn
+CMD ["uv", "run", "--frozen", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

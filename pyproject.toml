@@ -1,0 +1,87 @@
+[project]
+name = "ia-dev-template"
+version = "0.1.0"
+description = "Template diplomado IA aplicado al desarrollo de software (FastAPI + Mock LLM + Agentes)"
+requires-python = ">=3.14,<3.15"
+dependencies = [
+  "fastapi>=0.143",
+  "starlette>=1.3.1",          # piso de seguridad (PYSEC-2026-248/249)
+  "uvicorn[standard]>=0.54",
+  "pydantic>=2.14,<3",
+  "httpx>=0.28.1",
+  "anyio>=4.14.2",             # piso de seguridad (PYSEC-2026-4024/4025)
+  "certifi>=2026.10.19",       # incidente eMudhra/emSign (oct-2026): CA comprometida removida
+  "urllib3>=2.8.0",            # piso de seguridad (PYSEC-2026-4175/4176/4177)
+  "python-dotenv>=1.2",
+]
+
+[project.optional-dependencies]
+ui = [
+  "streamlit>=1.66.1",
+  "pillow>=13.0.0",            # transitiva de streamlit · piso de seguridad
+]
+llm = [
+  "openai>=2.54,<3",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=9.0.3,<10",         # piso de seguridad (PYSEC-2026-1845)
+  "pytest-asyncio>=1.4",
+  "pytest-cov>=7",
+  "ruff>=0.17",
+  "coverage>=7.16",
+  "mypy>=1.20,<2",             # mypy 2.x endurece chequeos: migrar en otro momento
+  "bandit>=1.9",
+  "pip-audit>=2.10",           # auditoría de vulnerabilidades del uv.lock (CI)
+  "httpx>=0.28.1",             # explícito para tests (no depender de transitiva de FastAPI)
+]
+
+[tool.uv]
+# uv < 0.13.4 confía en la CA comprometida de eMudhra/emSign: uv se niega a correr.
+required-version = ">=0.13.4"
+# Defensa contra paquetes comprometidos (caso litellm 1.107.0, 21-oct-2026):
+# uv ignora versiones publicadas hace menos de 7 días. Un paquete comprometido
+# suele detectarse y retirarse de PyPI en horas.
+exclude-newer = "7 days"
+# Excepciones explícitas para parches de seguridad que se necesitaban antes de
+# cumplir los 7 días. Agregar o quitar una excepción es una decisión documentada.
+exclude-newer-package = { certifi = "2026-10-22T00:00:00Z", streamlit = "2026-10-22T00:00:00Z", filelock = "2026-10-22T00:00:00Z" }
+# certifi: CA eMudhra/emSign · streamlit 1.66.1: primera que acepta pillow 13
+# filelock 4.2.1+: parche de CVEs (transitiva de pip-audit)
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+# E,F,W = pycodestyle/pyflakes  ·  I = isort  ·  N = pep8-naming
+# UP = pyupgrade  ·  BLE = blind-except  ·  PLW = pylint warnings
+# S = flake8-bandit (detecta eval, hardcoded secrets, etc. — AI Smell de Lab 1)
+select = ["E", "F", "W", "I", "N", "UP", "BLE", "PLW", "S"]
+ignore = ["E501", "S101"]  # S101 = assert en tests es OK
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S106"]  # asserts y "passwords" hardcodeados en tests son OK
+
+[tool.mypy]
+python_version = "3.14"
+ignore_missing_imports = true
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+filterwarnings = [
+  # Aviso de Starlette sobre httpx→httpx2 al importar TestClient (cosmético).
+  "ignore:.*httpx.*starlette.*deprecated.*",
+  "ignore:.*httpx2.*",
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["app/mock_llm.py"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 60
