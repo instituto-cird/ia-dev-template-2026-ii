@@ -441,7 +441,7 @@ git push
 Cuando el estudiante carga su usuario de GitHub en Moodle, el equipo docente crea su repositorio a partir del template del curso y lo invita por correo. Una vez aceptada la invitación, en la página del repositorio en GitHub se hace click en el botón verde **Code**, se copia la URL HTTPS y en la terminal se ejecuta:
 
 ```bash
-git clone https://github.com/cird-ia-2026-ii/ia-dev-<tu-usuario>.git
+git clone https://github.com/instituto-cird/ia-dev-<tu-usuario>.git
 cd ia-dev-<tu-usuario>
 ```
 

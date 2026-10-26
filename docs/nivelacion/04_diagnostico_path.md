@@ -227,7 +227,7 @@ uv --version
 # Debe retornar: uv 0.13.4 o superior (si no: UV_SYSTEM_CERTS=true uv self update)
 
 # 4. Clonar y configurar el repo
-git clone https://github.com/cird-ia-2026-ii/ia-dev-<tu-usuario>.git
+git clone https://github.com/instituto-cird/ia-dev-<tu-usuario>.git
 cd ia-dev-<tu-usuario>
 uv sync --all-groups    # uv descarga Python 3.14 automáticamente si no está
 uv run --frozen python --version # Debe retornar: Python 3.14.x

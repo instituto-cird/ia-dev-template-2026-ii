@@ -54,13 +54,13 @@ git config --global --list
 
 ```bash
 # 1. Clona TU repo (el que el equipo docente creó para ti)
-git clone https://github.com/cird-ia-2026-ii/ia-dev-<tu-usuario>.git
+git clone https://github.com/instituto-cird/ia-dev-<tu-usuario>.git
 cd ia-dev-<tu-usuario>
 
 # 2. Verifica que apunta al origen correcto
 git remote -v
 # Debe mostrar:
-# origin  https://github.com/cird-ia-2026-ii/ia-dev-<tu-usuario>.git
+# origin  https://github.com/instituto-cird/ia-dev-<tu-usuario>.git
 
 # 3. Setup del ambiente
 uv sync --all-groups
