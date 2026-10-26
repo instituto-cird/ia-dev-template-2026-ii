@@ -1,10 +1,10 @@
 # ia-dev-template
 
-Template oficial del **Diplomado: IA Aplicada al Desarrollo de Software**.
+Template oficial del curso **IA Aplicada al Desarrollo de Software**.
 
-Este repositorio es tu entorno de trabajo durante los 5 módulos del diplomado. NO creas repos nuevos por módulo — cada PR de evaluación agrega capas sobre este mismo repo. Al terminar el diplomado, el historial de commits ES tu portafolio profesional.
+Este repositorio es tu entorno de trabajo durante los 5 módulos. No crearás repos nuevos por módulo — cada PR de evaluación agrega capas sobre este mismo repo. Al terminar el diplomado, el historial de commits es tu portafolio profesional.
 
-> 🏦 **Contexto narrativo:** este template es el **sistema nuevo Greenfield** que vas a construir para **LegacyPay** (la empresa ficticia del caso de estudio del M1). Coexiste con el monolito legado de LegacyPay y demuestra el patrón Agent Manager. Los merchants en `data/merchants_sample.json` y las herramientas en `agent/tools/` (como `merchant_lookup.py`) salen del universo LegacyPay. 
+> 🏦 **Contexto narrativo:** este template es el **sistema nuevo Greenfield** que vas a construir para **LegacyPay** (la empresa ficticia del caso de estudio del curso). Coexiste con el monolito legado de LegacyPay y demuestra el patrón Agent Manager. Los merchants en `data/merchants_sample.json` y las herramientas en `agent/tools/` (como `merchant_lookup.py`) salen del universo LegacyPay. 
 
 ---
 
@@ -48,7 +48,7 @@ Este repositorio es tu entorno de trabajo durante los 5 módulos del diplomado. 
 
 ```bash
 # 1. Clona tu repo (te llega una invitación de GitHub por correo)
-git clone https://github.com/cird-ia-2026-ii/ia-dev-<tu-usuario>.git
+git clone https://github.com/instituto-cird/ia-dev-<tu-usuario>.git
 cd ia-dev-<tu-usuario>
 
 # 2. Copia el .env de ejemplo
@@ -203,11 +203,11 @@ Este diplomado fomenta el uso de herramientas avanzadas (Cursor, Claude Code, Co
 
 **Vibe Coding:** Está prohibido entregar código que funciona "de casualidad". Si en la defensa se te pregunta "¿por qué usaste esta librería?" y la respuesta es "porque Claude lo puso", se considera fallo.
 
-### Flujo de trabajo AI-Native (Estándar 2026)
+### Flujo de trabajo AI-Native
 
 1. **Ideación (Humano):** Defines el Qué y el Por qué en un Issue de GitHub.
 
-2. **Scaffolding (Agente):** Usas `uv` + Cursor/Claude para generar la estructura base.
+2. **Scaffolding (Agente):** Usas `uv` + IA para generar la estructura base.
 
 3. **Refinamiento (Humano + Linter):** Corres `ruff` y ajustas la arquitectura. Aquí aplicas el filtro de [AI Code Smells](docs/AI_CODE_SMELLS.md).
 
@@ -224,7 +224,7 @@ Este diplomado fomenta el uso de herramientas avanzadas (Cursor, Claude Code, Co
 1. Cuando el estudiante carga su usuario de GitHub en Moodle, el equipo docente crea **su repositorio** a partir de este template y lo invita con permiso de escritura. La invitación llega por correo y vence a los 7 días; si vence, se pide al equipo docente que la reenvíe.
 2. Aceptar la invitación y clonar **el repositorio propio** (no el template original):
    ```bash
-   git clone https://github.com/cird-ia-2026-ii/ia-dev-<tu-usuario>.git
+   git clone https://github.com/instituto-cird/ia-dev-<tu-usuario>.git
    ```
 3. La rama `main` está protegida: todo cambio entra por Pull Request y con la CI en verde.
 4. La CI corre automáticamente en cada push y en cada PR; el estado se ve en la pestaña **Actions** del repositorio.
