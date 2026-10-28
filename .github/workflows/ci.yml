@@ -8,14 +8,16 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # Versión fija: ubuntu-latest migra a Ubuntu 26 desde el 19-oct-2026 y la
+    # imagen podría cambiar a mitad del curso.
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7          # Node.js 24
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6      # Node.js 24 (v7 salió el 21-oct: dentro de la ventana de 7 días)
         with:
           python-version-file: ".python-version"
 

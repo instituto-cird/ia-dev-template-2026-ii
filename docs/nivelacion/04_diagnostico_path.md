@@ -164,11 +164,11 @@ on:                         # Cuándo se dispara
 
 jobs:
   test:                     # Nombre del job
-    runs-on: ubuntu-latest  # Ambiente: Linux en GitHub
+    runs-on: ubuntu-24.04  # Ambiente: Linux en GitHub (versión fija)
 
     steps:
-      - uses: actions/checkout@v4        # Descarga el código del repo
-      - uses: actions/setup-python@v5   # Instala Python 3.14
+      - uses: actions/checkout@v7        # Descarga el código del repo
+      - uses: actions/setup-python@v6   # Instala Python 3.14
       - uses: astral-sh/setup-uv@v7     # Instala uv
       - run: uv sync --frozen           # Instala dependencias exactas del uv.lock
       - run: uv run --frozen ruff check .        # Linter — falla si hay errores de estilo
