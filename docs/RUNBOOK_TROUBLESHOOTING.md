@@ -38,13 +38,114 @@ uv --version
 
 ### `Required uv version >=0.13.4 does not match the running version`
 
-El `uv` instalado es anterior al incidente de certificados de eMudhra/emSign (oct-2026) y el proyecto se niega a usarlo. Hay que actualizarlo:
+El `uv` que se está ejecutando es anterior al incidente de certificados de eMudhra/emSign (oct-2026) y el proyecto se niega a usarlo. Cómo se actualiza depende de **cómo se instaló**:
+
+| Cómo se instaló | Cómo se actualiza |
+|---|---|
+| Instalador oficial (`install.ps1` o `install.sh`) | `uv self update` (ver comandos abajo) |
+| WinGet | `winget upgrade --id=astral-sh.uv -e` |
+| Scoop | `scoop update uv` |
+| pipx | `pipx upgrade uv` |
+| pip (`pip install uv`) | Conviene **desinstalarlo** y usar el instalador oficial (caso siguiente) |
+| Homebrew (macOS) | `brew upgrade uv` |
+
+Con el instalador oficial, la actualización usa los certificados del sistema operativo:
+
+```powershell
+# Windows (PowerShell)
+$env:UV_SYSTEM_CERTS="true"; uv self update
+```
 
 ```bash
+# Git Bash, macOS o Linux
 UV_SYSTEM_CERTS=true uv self update
-# Si uv se instaló con Homebrew: brew upgrade uv
-# Si se instaló con pip/pipx: pipx upgrade uv
 ```
+
+Después de actualizar, **cerrar y volver a abrir la terminal** y comprobar con `uv --version` (0.13.4 o superior).
+
+### `Self-update is only available for uv binaries installed via the standalone installation scripts`
+
+Hay **dos copias de uv** instaladas y la terminal encuentra primero la vieja. El caso más común: uv se instaló alguna vez con `pip install uv` (lo indican muchos tutoriales) y después con el instalador oficial. El mensaje de error dice dónde está cada una:
+
+- *The current executable is at …* → la copia que se está usando (la vieja).
+- *… was used to install uv to …* → la copia del instalador oficial.
+
+**1. Ver todas las copias.**
+
+```powershell
+# Windows (PowerShell o cmd)
+where.exe uv
+```
+
+```bash
+# Git Bash, macOS o Linux
+which -a uv
+```
+
+Rutas típicas en Windows:
+
+| Ruta | Origen |
+|---|---|
+| `C:\Users\<usuario>\.local\bin\uv.exe` | Instalador oficial (**la que se conserva**) |
+| `C:\Users\<usuario>\AppData\Local\Programs\Python\Python3xx\Scripts\uv.exe` | `pip install uv` con el Python de python.org |
+| `C:\Users\<usuario>\AppData\Roaming\Python\Python3xx\Scripts\uv.exe` | `pip install --user uv` |
+| `C:\Users\<usuario>\scoop\shims\uv.exe` | Scoop |
+| `C:\Users\<usuario>\AppData\Local\Microsoft\WinGet\Links\uv.exe` | WinGet |
+
+En macOS, la copia de pip suele estar en `/Library/Frameworks/Python.framework/Versions/3.x/bin/uv`; en Linux, en `~/.local/lib/python3.x/` o en un entorno virtual.
+
+**2. Quitar la copia de pip.** Usar el Python que aparece en la ruta de la copia vieja (`3xx` = versión):
+
+```powershell
+# Windows: el lanzador py lista los Python instalados
+py -0p
+py -3.13 -m pip uninstall -y uv        # repetir con cada versión que tenga uv
+```
+
+```bash
+# macOS (Python de python.org)
+/Library/Frameworks/Python.framework/Versions/3.13/bin/python3 -m pip uninstall -y uv
+```
+
+**3. Actualizar la copia oficial**, cerrar y volver a abrir la terminal, y comprobar que quede una sola:
+
+```powershell
+# Windows (PowerShell)
+$env:UV_SYSTEM_CERTS="true"; & "$env:USERPROFILE\.local\bin\uv.exe" self update
+where.exe uv          # una sola línea: ...\.local\bin\uv.exe
+uv --version          # 0.13.4 o superior
+```
+
+```bash
+# Git Bash, macOS o Linux
+UV_SYSTEM_CERTS=true ~/.local/bin/uv self update
+hash -r; which -a uv  # una sola línea: .../.local/bin/uv
+uv --version
+```
+
+Si después del paso 3 la terminal ya no encuentra `uv`, falta `.local\bin` en el PATH:
+
+```powershell
+# Windows: agregar al PATH del usuario y abrir una terminal nueva
+[Environment]::SetEnvironmentVariable("Path", "$env:USERPROFILE\.local\bin;$([Environment]::GetEnvironmentVariable('Path', 'User'))", "User")
+```
+
+```bash
+# macOS (zsh)
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc && source ~/.zshrc
+```
+
+**Además, actualizar pip** en el Python de python.org de donde se quitó uv: el pip anterior a 26.2.2 sigue confiando en la autoridad de certificación comprometida (aviso de Python, 20-oct-2026). Con el archivo verificado que publica el aviso:
+
+```powershell
+# Windows (cambiar -3.13 por la versión que corresponda)
+py -3.13 -m pip install --upgrade "https://files.pythonhosted.org/packages/3f/06/3e4420302363fbb71be3c7f35ce042f54bfca330e3e66b3a2e3c4cca579f/pip-26.2.2-py3-none-any.whl#sha256=fd7f4dfa8190e014013b9f08f3e973f4e4c26ffd179a204895533a7254813a70"
+py -3.13 -m pip install --upgrade certifi
+```
+
+En macOS, el mismo comando con `/Library/Frameworks/Python.framework/Versions/3.13/bin/python3 -m pip` en lugar de `py -3.13 -m pip`.
+
+Fuentes: Astral, *Installing uv* (documentación oficial, consultada el 28-oct-2026), fuente de proveedor; Python Software Foundation, [Information for Python users regarding eMudhra/emSign CA certificate security incident](https://discuss.python.org/t/information-for-python-users-regarding-emudhra-emsign-ca-certificate-security-incident/109576) (20-oct-2026).
 
 ### `uv sync` falla con "Python 3.14 not found"
 

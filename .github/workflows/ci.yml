@@ -25,6 +25,9 @@ jobs:
           version: "0.13.4"   # fija; >= 0.13.4 por incidente eMudhra/emSign
           enable-cache: true
 
+      - name: Lockfile al día con pyproject.toml
+        run: uv lock --check
+
       - name: Sync dependencies (locked)
         run: uv sync --frozen --all-groups
 
