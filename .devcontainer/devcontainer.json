@@ -83,5 +83,5 @@
     "memory": "4gb",
     "storage": "32gb"
   },
-  "updateContentCommand": "uv sync"
+  "updateContentCommand": "uv sync --locked --all-groups --all-extras"
 }

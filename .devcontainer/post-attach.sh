@@ -8,7 +8,7 @@ set -euo pipefail
 if [ -f .venv/bin/activate ]; then
   echo "✓ Diplomado IA listo. Entorno virtual disponible en .venv/"
   echo "  Comandos frecuentes:"
-  echo "    uv sync                            (sincronizar dependencias)"
+  echo "    uv sync --all-groups --all-extras  (sincronizar dependencias)"
   echo "    uv run --frozen pytest                      (correr tests)"
   echo "    uv run --frozen uvicorn app.main:app --reload  (levantar backend)"
 fi

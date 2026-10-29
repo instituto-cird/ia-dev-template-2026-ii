@@ -10,8 +10,11 @@ echo "════════════════════════�
 echo ""
 
 # 1. Sincronizar dependencias del proyecto con uv.
+#    --all-groups: herramientas de desarrollo (pytest, ruff, mypy, bandit, pip-audit)
+#    --all-extras: grupos opcionales (ui = Streamlit, llm = SDK de OpenAI)
+#    --locked: falla si uv.lock no coincide con pyproject.toml, en lugar de reescribirlo
 echo "▸ Sincronizando dependencias con uv..."
-uv sync --all-extras
+uv sync --locked --all-groups --all-extras
 
 # 2. Asegurar que existe un .env de trabajo a partir de .env.example.
 if [ ! -f .env ]; then
@@ -43,15 +46,26 @@ print(f'  pytest: {pytest.__version__}')
 # 5. Verificar que pytest corre (smoke test del repo).
 echo ""
 echo "▸ Corriendo pytest (smoke test del repo)..."
+# Un test que falla no detiene la creación del Codespace (el entorno sigue
+# siendo usable para diagnosticar), pero el mensaje final lo dice.
+TESTS_OK=true
 if uv run --frozen pytest -q --tb=no 2>&1 | tail -5; then
   echo "  ✓ Tests del template pasan."
 else
-  echo "  ⚠ Algún test falló o no hay tests todavía. Revisar después del Lab 0."
+  TESTS_OK=false
+  echo "  ⚠ Hay tests que fallan."
 fi
 
 echo ""
 echo "════════════════════════════════════════════════════════════════════"
-echo "  ✓ Entorno listo."
+if [ "$TESTS_OK" = true ]; then
+  echo "  ✓ Entorno listo."
+else
+  echo "  ⚠ Entorno creado, pero con tests que fallan."
+  echo "    Ver el detalle con:      uv run --frozen pytest -v"
+  echo "    Verificación completa:   bash scripts/verify_setup.sh"
+  echo "    Si no se resuelve, consultar docs/RUNBOOK_TROUBLESHOOTING.md"
+fi
 echo ""
 echo "  Próximos pasos sugeridos:"
 echo "    1. Levantar el Mock LLM:   uv run --frozen python -m app.mock_llm"
