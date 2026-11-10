@@ -289,4 +289,8 @@ Ambos tracks comparten los mismos requisitos de CI, `AI_USAGE.md`, `DEMO_PLAN.md
 **Nombre:** Marcos Ferreria
 **Ciudad:** Encarnación
 **Qué me gustaría construir en el programa:** una línea. Un sistema de pagos
- 
+
+
+
+
+
