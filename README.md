@@ -294,3 +294,6 @@ Ambos tracks comparten los mismos requisitos de CI, `AI_USAGE.md`, `DEMO_PLAN.md
 
 
 
+
+
+![example workflow](https://github.com/instituto-cird/ia-dev-template-2026-ii/actions/workflows/ci.yml/badge.svg)
