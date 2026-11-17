@@ -19,6 +19,8 @@ RUN uv sync --frozen --no-dev
 
 # Copia el código fuente
 COPY app/ ./app/
+COPY agent/ ./agent/
+COPY data/ ./data/
 
 # Expone el puerto de la API
 EXPOSE 8000

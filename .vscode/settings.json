@@ -1,0 +1,9 @@
+{
+  "chat.tools.terminal.autoApprove": {
+    "/^uv run --frozen pytest/": true,
+    "/^uv run --frozen ruff check/": true,
+    "git push": false,
+    "rm": false,
+    "/^uv (add|remove|lock)/": false
+  }
+}
