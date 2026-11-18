@@ -4,7 +4,7 @@ tests/test_politica_agente.py · Ejercitario M1, clase 1.
 La política de permisos del agente es configuración, no prosa: esta prueba
 verifica que los comandos de la lista «nunca sin preguntar» no queden
 autoaprobados. Revisa .vscode/settings.json (Copilot en VS Code) y,
-si existe, opencode.json (OpenCode).
+si existe, opencode.json (OpenCode 1 o 2).
 """
 
 import json
@@ -64,20 +64,50 @@ def test_vscode_no_autoaprueba(comando: str) -> None:
     )
 
 
+def _patron_opencode(patron: str, comando: str) -> bool:
+    """Comodines de OpenCode: * es cualquier texto y ? un solo carácter.
+
+    En OpenCode 2, un patrón de shell que termina en « *» también
+    coincide con el comando sin argumentos («git push *» con «git push»).
+    """
+    regex = re.escape(patron).replace(r"\*", ".*").replace(r"\?", ".")
+    if re.fullmatch(regex, comando):
+        return True
+    return patron.endswith(" *") and comando == patron[:-2]
+
+
+def _decision_opencode(conf: dict[str, Any], comando: str) -> str:
+    """Devuelve allow, ask o deny para un comando de terminal.
+
+    Lee los dos formatos: OpenCode 2 (lista «permissions», acción «shell»)
+    y OpenCode 1 («permission» → «bash»). En los dos gana la última regla
+    que coincide; si ninguna coincide, OpenCode pregunta (ask).
+    """
+    reglas = conf.get("permissions")
+    if isinstance(reglas, list):
+        decision = "ask"
+        for regla in reglas:
+            if regla.get("action") != "shell":
+                continue
+            if _patron_opencode(regla.get("resource", ""), comando):
+                decision = regla.get("effect", "ask")
+        return decision
+
+    permiso = conf.get("permission", "ask")
+    if isinstance(permiso, str):
+        return permiso
+    bash = permiso.get("bash", permiso.get("*", "ask"))
+    if isinstance(bash, str):
+        return bash
+    decision = "ask"
+    for patron, valor in bash.items():
+        if _patron_opencode(patron, comando):
+            decision = valor
+    return decision
+
+
 @pytest.mark.skipif(not OPENCODE.exists(), reason="sin opencode.json")
 @pytest.mark.parametrize("comando", NUNCA_SIN_PREGUNTAR)
 def test_opencode_no_permite(comando: str) -> None:
-    permiso = _cargar(OPENCODE).get("permission", "ask")
-    if isinstance(permiso, str):
-        assert permiso != "allow", "permission: \"allow\" aprueba todo"
-        return
-    bash = permiso.get("bash", permiso.get("*", "ask"))
-    if isinstance(bash, str):
-        assert bash != "allow", f"bash: \"allow\" aprueba '{comando}'"
-        return
-    # Gana el último patrón que coincide (documentación de OpenCode).
-    decision = "ask"
-    for patron, valor in bash.items():
-        if re.fullmatch(re.escape(patron).replace(r"\*", ".*"), comando):
-            decision = valor
+    decision = _decision_opencode(_cargar(OPENCODE), comando)
     assert decision != "allow", f"'{comando}' queda permitido en {OPENCODE.name}"
