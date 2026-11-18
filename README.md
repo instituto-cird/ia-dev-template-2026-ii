@@ -2,9 +2,11 @@
 
 Template oficial del curso **IA Aplicada al Desarrollo de Software**.
 
-Este repositorio es tu entorno de trabajo durante los 5 módulos. No crearás repos nuevos por módulo — cada PR de evaluación agrega capas sobre este mismo repo. Al terminar el diplomado, el historial de commits es tu portafolio profesional.
+Este repositorio es tu entorno de trabajo durante los 5 módulos. No crearás repos nuevos por módulo — cada PR de evaluación agrega capas sobre este mismo repo. Al terminar el curso, el historial de commits es tu portafolio profesional.
 
-> 🏦 **Contexto narrativo:** este template es el **sistema nuevo Greenfield** que vas a construir para **LegacyPay** (la empresa ficticia del caso de estudio del curso). Coexiste con el monolito legado de LegacyPay y demuestra el patrón Agent Manager. Los merchants en `data/merchants_sample.json` y las herramientas en `agent/tools/` (como `merchant_lookup.py`) salen del universo LegacyPay. 
+> 🏦 **Contexto del caso:** LegacyPay, la empresa ficticia del caso de estudio del curso, no va a reescribir su monolito desde cero: lo va a modernizar de a poco, sin cortes de servicio. Este repositorio es el **servicio nuevo que crece alrededor del monolito** y le va tomando funciones una por una, mientras el sistema viejo sigue funcionando. Ese enfoque tiene nombre: patrón *strangler fig* ([Fowler](https://martinfowler.com/bliki/StranglerFigApplication.html)).
+>
+> Cada estudiante trabaja en este servicio en el rol de *Agent Manager*, un término del curso (no un puesto estandarizado del mercado): delega tareas a agentes de IA sin delegar la responsabilidad por las decisiones y los resultados. Los comercios de `data/merchants_sample.json` y las herramientas de `agent/tools/` (como `merchant_lookup.py`) son datos ficticios de LegacyPay. El caso completo está en Moodle: *M1 · Caso de estudio LegacyPay*.
 
 ---
 
@@ -57,11 +59,11 @@ cp .env.example .env
 # 3. Instala dependencias (incluyendo dev tools)
 uv sync --all-groups
 
-# 4. Verifica que todo está listo (22 chequeos automáticos)
+# 4. Verifica que todo está listo (chequeos automáticos del entorno)
 bash scripts/verify_setup.sh
 
 # Si el script termina con "✅ Entorno listo": estás listo.
-# Si falla algo: leé docs/RUNBOOK_TROUBLESHOOTING.md antes de pedir ayuda.
+# Si falla algo: lee docs/RUNBOOK_TROUBLESHOOTING.md antes de pedir ayuda.
 ```
 
 ---
@@ -103,7 +105,7 @@ ia-dev-template/
 │
 ├── .github/
 │   └── workflows/
-│       └── ci.yml          # Pipeline: ruff → mypy → bandit → pytest+coverage
+│       └── ci.yml          # Pipeline: uv.lock al día → ruff → mypy → bandit → pip-audit → pytest+coverage
 │
 ├── .env.example            # Variables de entorno (copia a .env y personaliza)
 ├── .python-version         # Python 3.14 (uv lo lee automáticamente)
@@ -195,7 +197,7 @@ uv run --frozen ruff check . && uv run --frozen mypy app/ --ignore-missing-impor
 
 ## 🤖 Política de uso de IA
 
-Este diplomado fomenta el uso de herramientas avanzadas (Cursor, Claude Code, Copilot), pero bajo la política de **"Copiloto, no Piloto Automático"**.
+Este curso fomenta el uso de herramientas avanzadas (Cursor, Claude Code, Copilot), pero bajo la política de **"Copiloto, no Piloto Automático"**.
 
 **Modo Manual (M1 y M2):** Desactiva el "auto-apply" de Claude Code/Cursor. Lee cada línea que la IA sugiere antes de aceptarla.
 
