@@ -129,10 +129,24 @@ uv run --frozen uvicorn app.main:app --reload --port 8000
 uv run --frozen uvicorn app.mock_llm:mock_app --port 8001
 # → Acepta requests en http://localhost:8001/v1/chat/completions
 
-# Terminal 3: Frontend Streamlit (opcional)
+# Terminal 3: Frontend React (consola de operaciones)
+cd web && npm ci && npm run dev
+# → UI en http://localhost:5173 (reenvía /api al backend del puerto 8000)
+
+# Alternativa: Frontend Streamlit
 uv run --frozen streamlit run frontend/app.py
 # → UI en http://localhost:8501
 ```
+
+El frontend React (`web/`, React + Vite + TypeScript) tiene tres vistas:
+
+| Vista | Qué muestra | Endpoints |
+|---|---|---|
+| **Resumen** | Volumen, comercios activos, transacciones marcadas y ranking de volumen | `GET /api/merchants`, `GET /api/transactions` |
+| **Comercios** | Tabla con búsqueda y filtros; panel de detalle con transacciones | `GET /api/merchants/{id}` |
+| **Asistente** | Consultas al agente ReAct con la traza de pensamiento, acción y observación | `POST /api/agent/run`, `GET /api/agent/tools` |
+
+El indicador de la barra superior consulta `GET /api/status` (backend + LLM) cada 15 s.
 
 ### Opción B — Docker (para prueba de ambiente reproducible)
 

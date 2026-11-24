@@ -130,7 +130,17 @@ def _decide_tool(user_msg: str) -> tuple[str, dict[str, Any], str]:
 
     Returns: (action, action_input, thought)
     """
+    # Heurística 0: llega la observación de una herramienta → cerrar con respuesta
+    if user_msg.startswith("Observacion:"):
+        observation = user_msg.removeprefix("Observacion:").strip()
+        return (
+            "FINISH",
+            {"answer": _summarize_observation(observation)},
+            "Ya tengo el resultado de la herramienta. Respondo al usuario.",
+        )
+
     msg = user_msg.lower()
+    merchant_match = re.search(r"(MCHT[-_]?\d{3,5})", user_msg, re.IGNORECASE)
 
     # Heurística 1: cálculos matemáticos → calculator
     # Detecta números con operadores (+, -, *, /, x, ^) o palabras 'calcula', 'cuanto'
@@ -139,11 +149,15 @@ def _decide_tool(user_msg: str) -> tuple[str, dict[str, Any], str]:
     )
     has_math_keyword = any(w in msg for w in ("calcula", "cuanto", "cuánto", "resultado", "suma", "multiplica"))
 
-    if has_math_expression or has_math_keyword:
+    if has_math_expression or (has_math_keyword and not merchant_match):
         # Intenta extraer la expresión
-        match = re.search(r"[\d\s\+\-\*\/x\^\.\(\)]+", user_msg)
-        expression = match.group(0).strip() if match else "1+1"
-        expression = expression.replace("x", "*")
+        # Toma el fragmento aritmético más largo que contenga un dígito
+        candidates = [
+            c.strip() for c in re.findall(r"[\d\s\+\-\*\/x\^\.\(\)]+", user_msg)
+            if re.search(r"\d", c)
+        ]
+        expression = max(candidates, key=len) if candidates else "1+1"
+        expression = expression.replace("x", "*").replace("^", "**")
         return (
             "calculate",
             {"expression": expression},
@@ -151,7 +165,6 @@ def _decide_tool(user_msg: str) -> tuple[str, dict[str, Any], str]:
         )
 
     # Heurística 2: lookup de comerciantes → merchant_lookup
-    merchant_match = re.search(r"(MCHT[-_]?\d{3,5})", user_msg, re.IGNORECASE)
     if merchant_match or "merchant" in msg or "comerciante" in msg or "comercio" in msg:
         merchant_id = merchant_match.group(1).upper() if merchant_match else "MCHT-00001"
         if "-" not in merchant_id and len(merchant_id) > 4:
@@ -180,6 +193,30 @@ def _decide_tool(user_msg: str) -> tuple[str, dict[str, Any], str]:
         )},
         "No tengo una herramienta clara para esta consulta. Termino el ciclo.",
     )
+
+
+_STATUS_ES = {"active": "activo", "suspended": "suspendido"}
+_RISK_ES = {"low": "bajo", "medium": "medio", "high": "alto"}
+
+
+def _summarize_observation(observation: str) -> str:
+    """Convierte la salida cruda de una herramienta en una respuesta legible."""
+    if observation.startswith(("ERROR", "NOT_FOUND")):
+        detail = observation.split(":", 1)[-1].strip()
+        return detail[:1].upper() + detail[1:]
+    try:
+        data = json.loads(observation)
+    except json.JSONDecodeError:
+        return f"El resultado es {observation}."
+    if isinstance(data, dict) and "merchant_id" in data:
+        status = _STATUS_ES.get(str(data.get("status")), data.get("status"))
+        risk = _RISK_ES.get(str(data.get("risk_level")), data.get("risk_level"))
+        limit = float(data.get("daily_limit_usd") or 0)
+        return (
+            f"{data.get('name')} ({data['merchant_id']}) está {status}, "
+            f"con un límite diario de USD {limit:,.0f} y riesgo {risk}."
+        )
+    return f"El resultado es {observation}."
 
 
 def _agent_response(user_msg: str) -> str:

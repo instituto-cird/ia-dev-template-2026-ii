@@ -36,12 +36,12 @@ def _safe_eval(node: ast.expr) -> float:
             raise ValueError(f"Operador no permitido: {op_type.__name__}")
         left = _safe_eval(node.left)
         right = _safe_eval(node.right)
-        return _SAFE_OPS[op_type](left, right)
+        return float(_SAFE_OPS[op_type](left, right))
     if isinstance(node, ast.UnaryOp):
-        op_type = type(node.op)
-        if op_type not in _SAFE_OPS:
-            raise ValueError(f"Operador unario no permitido: {op_type.__name__}")
-        return _SAFE_OPS[op_type](_safe_eval(node.operand))
+        unary_type = type(node.op)
+        if unary_type not in _SAFE_OPS:
+            raise ValueError(f"Operador unario no permitido: {unary_type.__name__}")
+        return float(_SAFE_OPS[unary_type](_safe_eval(node.operand)))
     raise ValueError(f"Expresion no soportada: {type(node).__name__}")
 
 
